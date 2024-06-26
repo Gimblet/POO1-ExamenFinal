@@ -1,0 +1,265 @@
+USE master
+GO
+
+IF DB_ID('ALMACENES') IS NOT NULL
+	USE master;
+	DROP DATABASE ALMACENES;
+GO
+
+CREATE DATABASE ALMACENES
+GO
+
+USE ALMACENES
+GO
+
+CREATE TABLE PRODUCTO
+(
+	COD_PRO		INT				PRIMARY KEY,
+	NOM_PRO		VARCHAR(80)		NOT NULL,
+	UME_PRO		VARCHAR(10)		NOT NULL
+)
+GO
+
+CREATE TABLE ALMACEN
+(
+	COD_ALM		INT				PRIMARY KEY,
+	NOM_ALM		VARCHAR(50)		NOT NULL,
+	UBI_ALM		VARCHAR(30)		NOT NULL
+)
+GO
+
+CREATE TABLE DETALLE_ALMACEN_PRODUCTO
+(
+	IDE_DET		INT				PRIMARY KEY IDENTITY(1,1),
+	COD_ALM		INT				NOT NULL,
+	COD_PRO		INT				NOT NULL,
+	CAN_PRO		INT				NOT NULL,
+	TIP_DET		VARCHAR(10)		NOT NULL DEFAULT 'Ingreso'
+	CONSTRAINT FK_TO_ALMACEN  FOREIGN KEY(COD_ALM) REFERENCES ALMACEN(COD_ALM),
+	CONSTRAINT FK_TO_PRODUCTO FOREIGN KEY(COD_PRO) REFERENCES PRODUCTO(COD_PRO),
+	CONSTRAINT CK_Cantidad_PRO CHECK(CAN_PRO >= 1),
+	CONSTRAINT CK_Tipo_DET CHECK(TIP_DET LIKE 'Ingreso' OR TIP_DET LIKE 'Salida')
+)
+GO
+
+CREATE PROCEDURE SP_ListarProductos
+AS
+BEGIN
+	SELECT P.* FROM PRODUCTO AS P
+END
+GO
+
+CREATE PROCEDURE SP_AgregarProducto
+(
+	@codigo	INT,
+	@nombre VARCHAR(80),
+	@unidad VARCHAR(10)
+)
+AS
+BEGIN
+	INSERT INTO PRODUCTO (COD_PRO,NOM_PRO, UME_PRO)
+	VALUES (@codigo, @nombre, @unidad)
+END
+GO
+
+EXEC SP_AgregarProducto 1,'Botella de Agua Cielo','Litros'
+GO
+EXEC SP_AgregarProducto 2,'Pie de Manzana','Onzas'
+GO
+
+CREATE PROCEDURE SP_EliminarProducto
+(
+	@codigo	INT
+)
+AS
+BEGIN
+	DELETE FROM PRODUCTO
+	WHERE COD_PRO = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_ActualizarProducto
+(
+	@codigo	INT,
+	@nombre VARCHAR(80),
+	@unidad VARCHAR(10)
+)
+AS
+BEGIN
+	UPDATE PRODUCTO SET NOM_PRO = @nombre,
+						UME_PRO = @unidad
+	WHERE COD_PRO = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_BuscarProducto
+(
+	@codigo INT
+)
+AS
+BEGIN
+	SELECT * FROM PRODUCTO
+	WHERE COD_PRO = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_AgregarAlmacen
+(
+	@codigo	   INT,
+	@nombre	   VARCHAR(50),
+	@ubicacion VARCHAR(30)
+)
+AS
+BEGIN
+	INSERT INTO ALMACEN (COD_ALM, NOM_ALM, UBI_ALM)
+	VALUES (@codigo, @nombre, @ubicacion)
+END
+GO
+
+SP_AgregarAlmacen 1,'Generales S.A.C', 'Los Olivos'
+GO
+SP_AgregarAlmacen 2,'Guardalos', 'Independencia'
+GO
+
+CREATE PROCEDURE SP_ActualizarAlmacen
+(
+	@codigo	INT,
+	@nombre VARCHAR(50),
+	@ubicacion	VARCHAR(30)
+)
+AS
+BEGIN
+	UPDATE ALMACEN SET NOM_ALM = @nombre,
+					   UBI_ALM = @ubicacion
+	WHERE COD_ALM = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_EliminarAlmacen
+(
+	@codigo	INT
+)
+AS
+BEGIN
+	DELETE FROM ALMACEN 
+	WHERE COD_ALM = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_ListarAlmacen
+AS
+BEGIN
+	SELECT * FROM ALMACEN
+END
+GO
+
+CREATE PROCEDURE SP_BuscarAlmacen
+(
+	@codigo	INT
+)
+AS
+BEGIN
+	SELECT * FROM ALMACEN
+	WHERE COD_ALM = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_ListadoGeneral
+AS
+BEGIN
+	SELECT A.COD_ALM AS [ID Almacen],
+		   P.COD_PRO AS [ID Producto],
+		   DT.IDE_DET AS [ID Detalle],
+		   P.NOM_PRO AS [Nombre Producto],
+		   P.UME_PRO AS [Unidad de Medida],
+		   DT.CAN_PRO AS [Cantidad],
+		   A.NOM_ALM AS [Almacen],
+		   A.UBI_ALM AS [Ubicacion],
+		   DT.TIP_DET AS [Tipo Detalle]
+	FROM ALMACEN AS A
+	JOIN DETALLE_ALMACEN_PRODUCTO AS DT ON A.COD_ALM = DT.COD_ALM
+	JOIN PRODUCTO AS P ON P.COD_PRO = DT.COD_PRO
+END
+GO
+
+CREATE PROCEDURE SP_ListadoGeneralxCodigo
+(
+	@codigo INT
+)
+AS
+BEGIN
+	SELECT A.COD_ALM  AS [ID Almacen],
+		   P.COD_PRO  AS [ID Producto],
+		   DT.IDE_DET AS [ID Detalle],
+		   P.NOM_PRO  AS [Nombre Producto],
+		   P.UME_PRO  AS [Unidad de Medida],
+		   DT.CAN_PRO AS [Cantidad],
+		   A.NOM_ALM AS [Almacen],
+		   A.UBI_ALM  AS [Ubicacion],
+		   DT.TIP_DET AS [Tipo Detalle]
+	FROM ALMACEN AS A
+	JOIN DETALLE_ALMACEN_PRODUCTO AS DT ON A.COD_ALM = DT.COD_ALM
+	JOIN PRODUCTO AS P ON P.COD_PRO = DT.COD_PRO
+	WHERE DT.IDE_DET = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_GestionarProductoEnAlmacen
+(
+	@almacen  INT,
+	@producto INT,
+	@tipo	  VARCHAR(10),
+	@cantidad INT
+)
+AS
+BEGIN
+	INSERT INTO DETALLE_ALMACEN_PRODUCTO
+	(COD_ALM, COD_PRO, TIP_DET, CAN_PRO)
+	VALUES
+	(@almacen, @producto, @tipo, @cantidad)
+END
+GO
+
+EXEC SP_GestionarProductoEnAlmacen 1,2,'Ingreso',3
+GO
+EXEC SP_GestionarProductoEnAlmacen 2,1,'Ingreso', 10
+GO
+EXEC SP_GestionarProductoEnAlmacen 2,1,'Salida', 3
+GO
+
+CREATE PROCEDURE SP_GenerarCodigoProducto
+AS
+BEGIN
+	SELECT ISNULL(MAX(P.COD_PRO),0) + 1 FROM PRODUCTO AS P
+END
+GO
+
+CREATE PROCEDURE SP_GenerarCodigoAlmacen
+AS
+BEGIN
+	SELECT ISNULL(MAX(A.COD_ALM),0) + 1 FROM ALMACEN AS A
+END
+GO
+
+CREATE OR ALTER PROCEDURE SP_ObtenerCantidadActual
+(
+	@producto INT,
+	@almacen INT
+)
+AS
+BEGIN
+	SELECT TOP 1 (
+				  (SELECT SUM(AP.CAN_PRO)
+				   FROM DETALLE_ALMACEN_PRODUCTO AS AP
+				   WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Ingreso'
+				   GROUP BY AP.COD_PRO) - 
+				  (SELECT SUM(AP.CAN_PRO)
+				   FROM DETALLE_ALMACEN_PRODUCTO AS AP
+				   WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Salida'
+				   GROUP BY AP.COD_PRO)
+				) AS [TOTAL]
+	FROM DETALLE_ALMACEN_PRODUCTO AS DT
+END
+GO
+
+SP_ObtenerCantidadActual 1, 2
