@@ -6,9 +6,38 @@
 
 <h2>Listado de Productos</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+<div class="container" style="display: flex; justify-content: space-between">
+    <p>
+        @Html.ActionLink("Nuevo Producto", "Create", null, new { @class = "btn btn-secondary" })
+    </p>
+    <div>
+        @using (Html.BeginForm("BuscarXCodigo", "Producto", FormMethod.Post, htmlAttributes: new { @class = "row g-3" }))
+        {
+            <div class="col-auto">
+                @Html.TextBox("ID", null, htmlAttributes: new { @class = "form-control", @placeholder = "Escribe un codigo" })
+            </div>
+            <div class="col-auto">
+                <input type="submit" value="Buscar" class="btn btn-dark" />
+            </div>
+        }
+    </div>
+</div> 
+@if (ViewBag.mensaje != null)
+{
+    <div>
+        <h5 class="alert alert-success" style="width: max-content; margin: auto">
+            @ViewBag.mensaje
+        </h5>
+    </div>
+}
+@if (ViewBag.error != null)
+{
+    <div>
+        <h5 class="alert alert-danger" style="width: max-content; margin: auto">
+            @ViewBag.error
+        </h5>
+    </div>
+}
 <table class="table">
     <tr>
         <th>
@@ -23,22 +52,23 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.COD_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.NOM_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UME_PRO)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id = item.COD_PRO }) |
-            @Html.ActionLink("Delete", "Delete", new { id = item.COD_PRO })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.COD_PRO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_PRO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UME_PRO)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id = item.COD_PRO }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id = item.COD_PRO })
+            </td>
+        </tr>
+    }
 
 </table>

@@ -1,0 +1,40 @@
+﻿@model WebApplication1.Models.Producto
+
+@{
+    ViewBag.Title = "Detalle";
+}
+
+<h2>Detalles del Producto</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.COD_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.COD_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NOM_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NOM_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UME_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UME_PRO)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Volver", "Index", null, new {@class = "btn btn-secondary"})
+</p>

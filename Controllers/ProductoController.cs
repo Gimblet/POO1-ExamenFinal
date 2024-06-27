@@ -7,6 +7,7 @@ using WebApplication1.Models;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.WebPages;
 
 namespace WebApplication1.Controllers
 {
@@ -52,7 +53,8 @@ namespace WebApplication1.Controllers
                 cnx.Open();
                 int value = cmd.ExecuteNonQuery();
                 mensaje = $"Se Agrego {value} producto/s";
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 mensaje = ex.Message;
             }
@@ -61,6 +63,91 @@ namespace WebApplication1.Controllers
                 cnx.Close();
             }
             return mensaje;
+        }
+
+        private string ActualizarProducto(Producto producto)
+        {
+            string mensaje = string.Empty;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_ActualizarProducto", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@codigo", producto.COD_PRO);
+                cmd.Parameters.AddWithValue("@nombre", producto.NOM_PRO);
+                cmd.Parameters.AddWithValue("@unidad", producto.UME_PRO);
+                cnx.Open();
+                int value = cmd.ExecuteNonQuery();
+                mensaje = $"Se modificaron los atributos de {value} producto/s";
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cnx.Close();
+            }
+            return mensaje;
+        }
+
+        private string EliminarProducto(int codigo)
+        {
+            string mensaje = string.Empty;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_EliminarProducto", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@codigo", codigo);
+                cnx.Open();
+                int value = cmd.ExecuteNonQuery();
+                mensaje = $"Se eliminaron {value} producto/s";
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+                if (mensaje.Contains("FK_TO_PRODUCTO"))
+                {
+                    mensaje = "Error >> No se puede eliminar el producto porque actualmente se encuentra almacenado";
+                }
+                else
+                {
+                    mensaje = "Error >> Ocurrió un problema";
+                }
+            }
+            finally
+            {
+                cnx.Close();
+            }
+            return mensaje;
+        }
+
+        private Producto BuscarProductoXCodigo(int ID)
+        {
+            Producto producto = null;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_BuscarProducto", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@codigo", ID);
+                cnx.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                {
+                    producto = new Producto();
+                    producto.COD_PRO = dr.GetInt32(0);
+                    producto.NOM_PRO = dr.GetString(1);
+                    producto.UME_PRO = dr.GetString(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                cnx.Close();
+            }
+            return producto;
         }
 
         private Producto obtenerProducto(int codigo)
@@ -73,6 +160,7 @@ namespace WebApplication1.Controllers
             SqlDataReader dr = cmd.ExecuteReader();
             if (dr.Read())
             {
+                producto = new Producto();
                 producto.COD_PRO = dr.GetInt32(0);
                 producto.NOM_PRO = dr.GetString(1);
                 producto.UME_PRO = dr.GetString(2);
@@ -101,8 +189,17 @@ namespace WebApplication1.Controllers
 
         #endregion
 
-        public ActionResult Index()
+        public ActionResult Index(string mensaje)
         {
+            if(!mensaje.IsEmpty() && mensaje.Contains("Error"))
+            {
+                ViewBag.error = mensaje;
+                return View(listarProductos());
+            }
+            else
+            {
+                ViewBag.mensaje = mensaje;
+            }
             return View(listarProductos());
         }
 
@@ -118,16 +215,62 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public ActionResult Create(Producto producto)
         {
+            string mensaje = string.Empty;
             if (ModelState.IsValid)
             {
-                ViewBag.mensaje = AgregarProducto(producto);
-                return RedirectToAction("Index");
+                mensaje = AgregarProducto(producto);
+                return RedirectToAction("Index", new { mensaje = mensaje});
             }
             else
             {
-                ViewBag.mensaje = "Error";
-                return View("Create");
+                mensaje = "Error";
+                return RedirectToAction("Create", new { error = mensaje});
             }
+        }
+
+        public ActionResult Edit(int id)
+        {
+            return View(Buscar(id));
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Producto producto)
+        {
+            string mensaje = string.Empty;
+            if (ModelState.IsValid)
+            {
+                mensaje = ActualizarProducto(producto);
+                return RedirectToAction("Index", new { mensaje = mensaje});
+            }
+            else
+            {
+                mensaje = "Error";
+                return RedirectToAction("Edit", new { mensaje = mensaje});
+            }
+        }
+
+        public ActionResult Delete(int id)
+        {
+            string mensaje = EliminarProducto(id);
+            return RedirectToAction("Index", new { mensaje = mensaje});
+        }
+
+        public ActionResult Details(Producto producto)
+        {
+            return View(producto);
+        }
+
+        [HttpPost]
+        public ActionResult BuscarXCodigo(string ID)
+        {
+            int codigo = Convert.ToInt32(ID);
+            Producto producto = BuscarProductoXCodigo(codigo);
+            if (producto == null)
+            {
+                string mensaje = "Error >> Producto no encontrado";
+                return RedirectToAction("Index", new { mensaje = mensaje });
+            }
+            return View("Details", producto);
         }
     }
 }
