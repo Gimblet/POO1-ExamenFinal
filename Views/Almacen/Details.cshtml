@@ -1,0 +1,41 @@
+﻿@model WebApplication1.Models.Almacen
+
+@{
+    ViewBag.Title = "Detalle";
+}
+
+<h2>Detalles del Almacen</h2>
+
+<div>
+    <h4>Almacen</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.COD_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.COD_ALM)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NOM_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NOM_ALM)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UBI_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UBI_ALM)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Volver", "Index", null, new {@class = "btn btn-secondary"})
+</p>

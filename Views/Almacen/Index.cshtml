@@ -1,0 +1,75 @@
+﻿@model IEnumerable<WebApplication1.Models.Almacen>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Listado de Almacenes</h2>
+<div class="container" style="display: flex; justify-content: space-between">
+    <p>
+        @Html.ActionLink("Nuevo Almacen", "Create", null, new { @class = "btn btn-secondary" })
+    </p>
+    <div>
+        @using (Html.BeginForm("BuscarXCodigo", "Almacen", FormMethod.Post, htmlAttributes: new { @class = "row g-3" }))
+        {
+            <div class="col-auto">
+                @Html.TextBox("ID", null, htmlAttributes: new { @class = "form-control", @placeholder = "Escribe un codigo" })
+            </div>
+            <div class="col-auto">
+                <input type="submit" value="Buscar" class="btn btn-dark" />
+            </div>
+        }
+    </div>
+</div> 
+@if (ViewBag.mensaje != null)
+{
+    <div>
+        <h5 class="alert alert-success" style="width: max-content; margin: auto">
+            @ViewBag.mensaje
+        </h5>
+    </div>
+}
+@if (ViewBag.error != null)
+{
+    <div>
+        <h5 class="alert alert-danger" style="width: max-content; margin: auto">
+            @ViewBag.error
+        </h5>
+    </div>
+}
+<table class="table">
+    <thead class="thead-p">
+        <tr>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.COD_ALM)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.NOM_ALM)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.UBI_ALM)
+            </th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <th scope="row">
+                    @Html.DisplayFor(modelItem => item.COD_ALM)
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NOM_ALM)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UBI_ALM)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", new { id = item.COD_ALM }) |
+                    @Html.ActionLink("Eliminar", "Delete", new { id = item.COD_ALM })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

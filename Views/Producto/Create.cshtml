@@ -1,7 +1,7 @@
 ﻿@model WebApplication1.Models.Producto
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Agregar Producto";
 }
 
 <h2>Agregar Producto</h2>
@@ -39,6 +39,7 @@
 
         <div class="form-group btn-group" style="margin-top: 12.5px">
             @Html.ActionLink("Regresar", "Index", null, new { @class = "btn btn-secondary" })
+            <input type="reset" value="Borrar" class="btn btn-danger"/>
             <input type="submit" value="Confirmar" class="btn btn-dark" />
         </div>
     </div>
