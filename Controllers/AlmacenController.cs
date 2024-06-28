@@ -120,7 +120,7 @@ namespace WebApplication1.Controllers
             return mensaje;
         }
 
-        private Almacen BuscarAlmacenXCodigo(int ID)
+        private Almacen obtenerAlmacen(int ID)
         {
             Almacen almacen = null;
             try
@@ -146,26 +146,6 @@ namespace WebApplication1.Controllers
             {
                 cnx.Close();
             }
-            return almacen;
-        }
-
-        private Almacen obtenerAlmacen(int codigo)
-        {
-            Almacen almacen = null;
-            SqlCommand cmd = new SqlCommand("SP_BuscarAlmacen", cnx);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@codigo", codigo);
-            cnx.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-            {
-                almacen = new Almacen();
-                almacen.COD_ALM = dr.GetInt32(0);
-                almacen.NOM_ALM = dr.GetString(1);
-                almacen.UBI_ALM = dr.GetString(2);
-            };
-            cnx.Close();
-            dr.Close();
             return almacen;
         }
 
@@ -262,7 +242,7 @@ namespace WebApplication1.Controllers
         public ActionResult BuscarXCodigo(string ID)
         {
             int codigo = Convert.ToInt32(ID);
-            Almacen almacen = BuscarAlmacenXCodigo(codigo);
+            Almacen almacen = obtenerAlmacen(codigo);
             if (almacen == null)
             {
                 string mensaje = "Error >> Almacen no encontrado";

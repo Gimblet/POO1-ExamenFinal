@@ -201,6 +201,7 @@
     <Content Include="Views\Almacen\Create.cshtml" />
     <Content Include="Views\Almacen\Edit.cshtml" />
     <Content Include="Views\Almacen\Details.cshtml" />
+    <Content Include="Views\Detalle\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

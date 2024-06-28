@@ -4,19 +4,43 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Lista de Detalles</h2>
+<h2>Listado de Detalles</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
+<div class="container" style="display: flex; justify-content: space-between">
+    <p>
+        @Html.ActionLink("Nuevo Detalle", "Create", null, new { @class = "btn btn-secondary" })
+    </p>
+    <div>
+        @using (Html.BeginForm("BuscarXCodigo", "Detalle", FormMethod.Post, htmlAttributes: new { @class = "row g-3" }))
+        {
+            <div class="col-auto">
+                @Html.TextBox("ID", null, htmlAttributes: new { @class = "form-control", @placeholder = "Escribe un codigo" })
+            </div>
+            <div class="col-auto">
+                <input type="submit" value="Buscar" class="btn btn-dark" />
+            </div>
+        }
+    </div>
+</div>
+@if (ViewBag.mensaje != null)
+{
+    <div>
+        <h5 class="alert alert-success" style="width: max-content; margin: auto">
+            @ViewBag.mensaje
+        </h5>
+    </div>
+}
+@if (ViewBag.error != null)
+{
+    <div>
+        <h5 class="alert alert-danger" style="width: max-content; margin: auto">
+            @ViewBag.error
+        </h5>
+    </div>
+}
+
+<table class="table table-hover">
     <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.COD_ALM)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.COD_PRO)
-        </th>
         <th>
             @Html.DisplayNameFor(model => model.IDE_DET)
         </th>
@@ -41,41 +65,45 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.COD_ALM)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.COD_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IDE_DET)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.NOM_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UME_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CAN_PRO)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.NOM_ALM)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UBI_ALM)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TIP_DET)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr class="fila">
+            <td>
+                @Html.DisplayFor(modelItem => item.IDE_DET)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_PRO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UME_PRO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CAN_PRO)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_ALM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UBI_ALM)
+            </td>
+            <td class="tipo">
+                @Html.DisplayFor(modelItem => item.TIP_DET)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id = item.IDE_DET }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id = item.IDE_DET })
+            </td>
+        </tr>
+    }
 
 </table>
+
+<script>
+    for (var i = 0; i < document.getElementsByClassName("fila").length; i++) {
+        if (document.getElementsByClassName("tipo")[i].innerText === "Ingreso") {
+            document.getElementsByClassName("fila")[i].style.backgroundColor = "#e9f8ec";
+        } else {
+            document.getElementsByClassName("fila")[i].classList.add("table-danger");
+        }
+    }
+</script>

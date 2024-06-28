@@ -121,7 +121,7 @@ namespace WebApplication1.Controllers
             return mensaje;
         }
 
-        private Producto BuscarProductoXCodigo(int ID)
+        private Producto obtenerProducto(int ID)
         {
             Producto producto = null;
             try
@@ -147,26 +147,6 @@ namespace WebApplication1.Controllers
             {
                 cnx.Close();
             }
-            return producto;
-        }
-
-        private Producto obtenerProducto(int codigo)
-        {
-            Producto producto = null;
-            SqlCommand cmd = new SqlCommand("SP_BuscarProducto", cnx);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@codigo", codigo);
-            cnx.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-            {
-                producto = new Producto();
-                producto.COD_PRO = dr.GetInt32(0);
-                producto.NOM_PRO = dr.GetString(1);
-                producto.UME_PRO = dr.GetString(2);
-            };
-            cnx.Close();
-            dr.Close();
             return producto;
         }
 
@@ -264,7 +244,7 @@ namespace WebApplication1.Controllers
         public ActionResult BuscarXCodigo(string ID)
         {
             int codigo = Convert.ToInt32(ID);
-            Producto producto = BuscarProductoXCodigo(codigo);
+            Producto producto = obtenerProducto(codigo);
             if (producto == null)
             {
                 string mensaje = "Error >> Producto no encontrado";

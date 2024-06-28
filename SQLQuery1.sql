@@ -30,7 +30,7 @@ GO
 
 CREATE TABLE DETALLE_ALMACEN_PRODUCTO
 (
-	IDE_DET		INT				PRIMARY KEY IDENTITY(1,1),
+	IDE_DET		INT				PRIMARY KEY,
 	COD_ALM		INT				NOT NULL,
 	COD_PRO		INT				NOT NULL,
 	CAN_PRO		INT				NOT NULL,
@@ -167,14 +167,12 @@ GO
 CREATE PROCEDURE SP_ListadoGeneral
 AS
 BEGIN
-	SELECT A.COD_ALM AS [ID Almacen],
-		   P.COD_PRO AS [ID Producto],
-		   DT.IDE_DET AS [ID Detalle],
-		   P.NOM_PRO AS [Nombre Producto],
-		   P.UME_PRO AS [Unidad de Medida],
+	SELECT DT.IDE_DET AS [ID Detalle],
+		   P.NOM_PRO  AS [Nombre Producto],
+		   P.UME_PRO  AS [Unidad de Medida],
 		   DT.CAN_PRO AS [Cantidad],
-		   A.NOM_ALM AS [Almacen],
-		   A.UBI_ALM AS [Ubicacion],
+		   A.NOM_ALM  AS [Almacen],
+		   A.UBI_ALM  AS [Ubicacion],
 		   DT.TIP_DET AS [Tipo Detalle]
 	FROM ALMACEN AS A
 	JOIN DETALLE_ALMACEN_PRODUCTO AS DT ON A.COD_ALM = DT.COD_ALM
@@ -188,13 +186,11 @@ CREATE PROCEDURE SP_ListadoGeneralxCodigo
 )
 AS
 BEGIN
-	SELECT A.COD_ALM  AS [ID Almacen],
-		   P.COD_PRO  AS [ID Producto],
-		   DT.IDE_DET AS [ID Detalle],
+	SELECT DT.IDE_DET AS [ID Detalle],
 		   P.NOM_PRO  AS [Nombre Producto],
 		   P.UME_PRO  AS [Unidad de Medida],
 		   DT.CAN_PRO AS [Cantidad],
-		   A.NOM_ALM AS [Almacen],
+		   A.NOM_ALM  AS [Almacen],
 		   A.UBI_ALM  AS [Ubicacion],
 		   DT.TIP_DET AS [Tipo Detalle]
 	FROM ALMACEN AS A
@@ -204,8 +200,9 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE SP_GestionarProductoEnAlmacen
+CREATE PROCEDURE SP_AgregarDetalle
 (
+	@codigo	  INT,
 	@almacen  INT,
 	@producto INT,
 	@tipo	  VARCHAR(10),
@@ -214,17 +211,28 @@ CREATE PROCEDURE SP_GestionarProductoEnAlmacen
 AS
 BEGIN
 	INSERT INTO DETALLE_ALMACEN_PRODUCTO
-	(COD_ALM, COD_PRO, TIP_DET, CAN_PRO)
+	(IDE_DET, COD_ALM, COD_PRO, TIP_DET, CAN_PRO)
 	VALUES
-	(@almacen, @producto, @tipo, @cantidad)
+	(@codigo, @almacen, @producto, @tipo, @cantidad)
 END
 GO
 
-EXEC SP_GestionarProductoEnAlmacen 1,2,'Ingreso',3
+EXEC SP_AgregarDetalle 1,1,2,'Ingreso',3
 GO
-EXEC SP_GestionarProductoEnAlmacen 2,1,'Ingreso', 10
+EXEC SP_AgregarDetalle 2,2,1,'Ingreso', 10
 GO
-EXEC SP_GestionarProductoEnAlmacen 2,1,'Salida', 3
+EXEC SP_AgregarDetalle 3,2,1,'Salida', 3
+GO
+
+CREATE PROCEDURE SP_BuscarDetalle
+(
+	@codigo INT
+)
+AS
+BEGIN
+	SELECT * FROM DETALLE_ALMACEN_PRODUCTO
+	WHERE IDE_DET = @codigo
+END
 GO
 
 CREATE PROCEDURE SP_GenerarCodigoProducto
@@ -238,6 +246,13 @@ CREATE PROCEDURE SP_GenerarCodigoAlmacen
 AS
 BEGIN
 	SELECT ISNULL(MAX(A.COD_ALM),0) + 1 FROM ALMACEN AS A
+END
+GO
+
+CREATE PROCEDURE SP_GenerarCodigoDetalle
+AS
+BEGIN
+	SELECT ISNULL(MAX(DT.IDE_DET),0) + 1 FROM DETALLE_ALMACEN_PRODUCTO AS DT
 END
 GO
 
