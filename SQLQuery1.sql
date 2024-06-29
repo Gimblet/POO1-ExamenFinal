@@ -66,6 +66,14 @@ EXEC SP_AgregarProducto 1,'Botella de Agua Cielo','Litros'
 GO
 EXEC SP_AgregarProducto 2,'Pie de Manzana','Onzas'
 GO
+EXEC SP_AgregarProducto 3,'Botella de Agua San Mateo','Litros'
+GO
+EXEC SP_AgregarProducto 4,'Turron','Gramos'
+GO
+EXEC SP_AgregarProducto 5,'Coca Cola','Litros'
+GO
+EXEC SP_AgregarProducto 6,'Pan Integral','Gramos'
+GO
 
 CREATE PROCEDURE SP_EliminarProducto
 (
@@ -119,6 +127,10 @@ GO
 SP_AgregarAlmacen 1,'Generales S.A.C', 'Los Olivos'
 GO
 SP_AgregarAlmacen 2,'Guardalos', 'Independencia'
+GO
+SP_AgregarAlmacen 3,'Almacenes Mundo', 'San Luis'
+GO
+SP_AgregarAlmacen 4,'DepoSeguro', 'Surco'
 GO
 
 CREATE PROCEDURE SP_ActualizarAlmacen
@@ -220,11 +232,23 @@ BEGIN
 END
 GO
 
-EXEC SP_AgregarDetalle 1,1,2,'Ingreso',3
+EXEC SP_AgregarDetalle 1,1,2,'Ingreso', 3
 GO
 EXEC SP_AgregarDetalle 2,2,1,'Ingreso', 10
 GO
-EXEC SP_AgregarDetalle 3,2,1,'Salida', 3
+EXEC SP_AgregarDetalle 3,2,1,'Salida', 2
+GO
+EXEC SP_AgregarDetalle 4,3,3,'Ingreso', 55
+GO
+EXEC SP_AgregarDetalle 5,2,1,'Salida', 4
+GO
+EXEC SP_AgregarDetalle 6,4,4,'Ingreso',3
+GO
+EXEC SP_AgregarDetalle 7,3,5,'Ingreso', 28
+GO
+EXEC SP_AgregarDetalle 8,1,6,'Ingreso', 32
+GO
+EXEC SP_AgregarDetalle 9,1,2,'Ingreso', 10
 GO
 
 CREATE PROCEDURE SP_BuscarDetalle
@@ -296,21 +320,33 @@ CREATE OR ALTER PROCEDURE SP_ObtenerCantidadActual
 )
 AS
 BEGIN
-	SELECT TOP 1 (
-				  (SELECT SUM(AP.CAN_PRO)
-				   FROM DETALLE_ALMACEN_PRODUCTO AS AP
-				   WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Ingreso'
-				   GROUP BY AP.COD_PRO) - 
-				  (SELECT SUM(AP.CAN_PRO)
-				   FROM DETALLE_ALMACEN_PRODUCTO AS AP
-				   WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Salida'
-				   GROUP BY AP.COD_PRO)
-				) AS [TOTAL]
-	FROM DETALLE_ALMACEN_PRODUCTO AS DT
+	DECLARE @ingreso INT;
+	DECLARE @salida	INT;
+	SET @ingreso = (SELECT TOP 1 (
+						SELECT SUM(AP.CAN_PRO)
+						FROM DETALLE_ALMACEN_PRODUCTO AS AP
+						WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Ingreso'
+						GROUP BY AP.COD_PRO)
+					FROM DETALLE_ALMACEN_PRODUCTO AS DT)
+	SET @salida = (SELECT TOP 1(
+						SELECT SUM(AP.CAN_PRO)
+						FROM DETALLE_ALMACEN_PRODUCTO AS AP
+						WHERE AP.COD_PRO = @producto AND AP.COD_ALM = @almacen AND AP.TIP_DET = 'Salida'
+						GROUP BY AP.COD_PRO)
+				   FROM DETALLE_ALMACEN_PRODUCTO AS DT)
+
+	IF (@salida) IS NOT NULL
+		BEGIN
+			SELECT @ingreso - @salida
+		END
+	ELSE
+		SELECT @ingreso
 END
 GO
 
 EXEC SP_ObtenerCantidadActual 1, 2
 GO
 EXEC SP_ObtenerCantidadActual 2, 1
+GO
+EXEC SP_ObtenerCantidadActual 5, 2
 GO
