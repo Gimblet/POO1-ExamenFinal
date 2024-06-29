@@ -142,7 +142,7 @@ namespace WebApplication1.Controllers
                 int value = cmd.ExecuteNonQuery();
                 mensaje = $"Se Actualizaron los datos de {value} detalle/s";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 mensaje = ex.Message;
                 if (mensaje.Contains("CK_Cantidad_PRO"))
@@ -152,7 +152,7 @@ namespace WebApplication1.Controllers
             }
             finally
             {
-                cnx.Close(); 
+                cnx.Close();
             }
             return mensaje;
         }
@@ -245,11 +245,42 @@ namespace WebApplication1.Controllers
             return reg;
         }
 
+        private string obtenerCantidad(Detalle detalle)
+        {
+            string mensaje = string.Empty;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_ObtenerCantidadActual", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@producto", detalle.COD_PRO);
+                cmd.Parameters.AddWithValue("@almacen", detalle.COD_ALM);
+                cnx.Open();
+                SqlDataReader rd = cmd.ExecuteReader();
+                if (rd.Read())
+                {
+                    mensaje = "La cantidad actual del producto es : " + rd.GetInt32(0).ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+                if(mensaje.Contains("Data is Null"))
+                {
+                    mensaje = "Error >> El producto seleccionado no se encuentra almacenado";
+                }
+            }
+            finally
+            {
+                cnx.Close();
+            }
+            return mensaje;
+        }
+
         #endregion
 
         public ActionResult Index(string mensaje)
         {
-            if(!mensaje.IsEmpty() && mensaje.Contains("Error"))
+            if (!mensaje.IsEmpty() && mensaje.Contains("Error"))
             {
                 ViewBag.error = mensaje;
                 return View(listarDetalles());
@@ -337,6 +368,31 @@ namespace WebApplication1.Controllers
                 return RedirectToAction("Index", new { mensaje = mensaje });
             }
             return View("Details", detalle);
+        }
+
+        public ActionResult Consultas(string mensaje)
+        {
+            ViewBag.Productos = new SelectList(listarProductos(), "COD_PRO", "NOM_PRO");
+            ViewBag.Almacenes = new SelectList(listarAlmacenes(), "COD_ALM", "NOM_ALM");
+            if (!mensaje.IsEmpty() && mensaje.Contains("Error"))
+            {
+                ViewBag.error = mensaje;
+                return View();
+            }
+            ViewBag.mensaje = mensaje;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ActionObtenerCantidad(Detalle detalle)
+        {
+            string mensaje = string.Empty;
+            mensaje = obtenerCantidad(detalle);
+            if (!mensaje.IsEmpty())
+            {
+                ViewBag.mensaje = mensaje;
+            }
+            return RedirectToAction("Consultas", new { mensaje = mensaje});
         }
     }
 }

@@ -204,6 +204,7 @@
     <Content Include="Views\Detalle\Create.cshtml" />
     <Content Include="Views\Detalle\Edit.cshtml" />
     <Content Include="Views\Detalle\Details.cshtml" />
+    <Content Include="Views\Detalle\Consultas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

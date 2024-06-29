@@ -310,4 +310,7 @@ BEGIN
 END
 GO
 
-SP_ObtenerCantidadActual 1, 2
+EXEC SP_ObtenerCantidadActual 1, 2
+GO
+EXEC SP_ObtenerCantidadActual 2, 1
+GO

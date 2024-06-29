@@ -1,0 +1,47 @@
+﻿@model WebApplication1.Models.Detalle
+
+@{
+    ViewBag.Title = "Consultas";
+}
+
+<h2>Consultar Stock Actual</h2>
+
+<div class="container w-auto" style="margin-left:25%; margin-top: 5%; margin-bottom: 5%">
+    @using (Html.BeginForm("ActionObtenerCantidad", "Detalle", FormMethod.Post, new { @class = "mb-3 mt-3 m-auto row" }))
+    {
+        <div class="col-auto">
+            @Html.LabelFor(model => model.COD_ALM, htmlAttributes: new { @class = "control-label" })
+            <div>
+                @Html.DropDownListFor(model => model.COD_ALM, ViewBag.Almacenes as SelectList, "Seleccione un Almacén", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.COD_ALM, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-md-auto">
+            @Html.LabelFor(model => model.COD_PRO, htmlAttributes: new { @class = "control-label" })
+            <div>
+                @Html.DropDownListFor(model => model.COD_PRO, ViewBag.Productos as SelectList, "Seleccione un Producto", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.COD_PRO, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-auto mt-auto">
+            <input type="submit" value="Obtener Cantidad" class="btn btn-dark " />
+        </div>
+    }
+</div>
+@if (ViewBag.mensaje != null)
+{
+    <div class="form-group alert alert-success text-center">
+        <h4>@ViewBag.mensaje</h4>
+    </div>
+}
+else if (ViewBag.error != null)
+{
+    <div class="form-group alert alert-danger text-center">
+        <h4>@ViewBag.error</h4>
+    </div>
+}
+
+
+
