@@ -241,7 +241,16 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public ActionResult BuscarXCodigo(string ID)
         {
-            int codigo = Convert.ToInt32(ID);
+            int codigo = -1;
+            try
+            {
+                codigo = Convert.ToInt32(ID);
+            }
+            catch (Exception)
+            {
+                string mensaje = "Error >> El valor debe ser un número entero";
+                return RedirectToAction("Index", new { mensaje = mensaje });
+            }
             Almacen almacen = obtenerAlmacen(codigo);
             if (almacen == null)
             {

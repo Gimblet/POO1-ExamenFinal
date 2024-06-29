@@ -360,7 +360,15 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public ActionResult BuscarXCodigo(string ID)
         {
-            int codigo = Convert.ToInt32(ID);
+            int codigo = -1;
+            try
+            {
+                codigo = Convert.ToInt32(ID);
+            } catch (Exception ex)
+            {
+                string mensaje = "Error >> El codigo debe ser un numero entero";
+                return RedirectToAction("Index", new { mensaje = mensaje });
+            }
             Detalle detalle = obtenerDetalleCompleto(codigo);
             if (detalle == null)
             {
