@@ -1,0 +1,65 @@
+﻿@model WebApplication1.Models.Detalle
+
+@{
+    ViewBag.Title = "Editar Detalle";
+}
+
+<h2>Editar Detalle</h2>
+
+@using (Html.BeginForm("Edit", "Detalle", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.IDE_DET, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.HiddenFor(model => model.IDE_DET)
+                @Html.EditorFor(model => model.IDE_DET, new { htmlAttributes = new { @class = "form-control disabled", @disabled = "true" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.COD_ALM, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.COD_ALM, ViewBag.Almacenes as SelectList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.COD_ALM, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.COD_PRO, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.COD_PRO, ViewBag.Productos as SelectList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.COD_PRO, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CAN_PRO, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CAN_PRO, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CAN_PRO, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TIP_DET, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.TIP_DET, ViewBag.Tipos as SelectList, "Original : " + Model.TIP_DET, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TIP_DET, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top: 12.5px">
+            @Html.ActionLink("Regresar", "Index", null, new { @class = "btn btn-secondary" })
+            <input type="submit" value="Confirmar Cambios" class="btn btn-dark" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

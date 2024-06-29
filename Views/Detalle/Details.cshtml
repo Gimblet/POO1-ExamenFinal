@@ -1,0 +1,87 @@
+﻿@model WebApplication1.Models.Detalle
+
+@{
+    ViewBag.Title = "Vista Detallada";
+}
+
+<h2>Vista detallada</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.IDE_DET)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IDE_DET)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.COD_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.COD_ALM)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.COD_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.COD_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NOM_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NOM_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UME_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UME_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CAN_PRO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CAN_PRO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NOM_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NOM_ALM)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UBI_ALM)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UBI_ALM)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TIP_DET)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TIP_DET)
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Volver", "Index", null, new {@class = "btn btn-secondary"})
+</p>

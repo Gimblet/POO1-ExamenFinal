@@ -177,6 +177,7 @@ BEGIN
 	FROM ALMACEN AS A
 	JOIN DETALLE_ALMACEN_PRODUCTO AS DT ON A.COD_ALM = DT.COD_ALM
 	JOIN PRODUCTO AS P ON P.COD_PRO = DT.COD_PRO
+	ORDER BY DT.IDE_DET DESC
 END
 GO
 
@@ -187,6 +188,8 @@ CREATE PROCEDURE SP_ListadoGeneralxCodigo
 AS
 BEGIN
 	SELECT DT.IDE_DET AS [ID Detalle],
+		   DT.COD_ALM AS [ID Almacen],
+		   DT.COD_PRO AS [ID Codigo],
 		   P.NOM_PRO  AS [Nombre Producto],
 		   P.UME_PRO  AS [Unidad de Medida],
 		   DT.CAN_PRO AS [Cantidad],
@@ -232,6 +235,36 @@ AS
 BEGIN
 	SELECT * FROM DETALLE_ALMACEN_PRODUCTO
 	WHERE IDE_DET = @codigo
+END
+GO
+
+CREATE PROCEDURE SP_ActualizarDetalle
+(
+	@id		  INT,
+	@almacen  INT,
+	@producto INT,
+	@cantidad INT,
+	@tipo     VARCHAR(10)
+)
+AS
+BEGIN
+	UPDATE DETALLE_ALMACEN_PRODUCTO 
+	SET COD_ALM = @almacen,
+		COD_PRO = @producto,
+		CAN_PRO = @cantidad,
+		TIP_DET = @tipo
+	WHERE IDE_DET = @id
+END
+GO
+
+CREATE PROCEDURE SP_EliminarDetalle
+(
+	@id INT
+)
+AS
+BEGIN
+	DELETE FROM DETALLE_ALMACEN_PRODUCTO
+	WHERE IDE_DET = @id
 END
 GO
 

@@ -125,9 +125,64 @@ namespace WebApplication1.Controllers
             }
             return mensaje;
         }
+
+        private string editarDetalle(Detalle detalle)
+        {
+            string mensaje = string.Empty;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_ActualizarDetalle", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", detalle.IDE_DET);
+                cmd.Parameters.AddWithValue("@almacen", detalle.COD_ALM);
+                cmd.Parameters.AddWithValue("@producto", detalle.COD_PRO);
+                cmd.Parameters.AddWithValue("@cantidad", detalle.CAN_PRO);
+                cmd.Parameters.AddWithValue("@tipo", detalle.TIP_DET);
+                cnx.Open();
+                int value = cmd.ExecuteNonQuery();
+                mensaje = $"Se Actualizaron los datos de {value} detalle/s";
+            }
+            catch(Exception ex)
+            {
+                mensaje = ex.Message;
+                if (mensaje.Contains("CK_Cantidad_PRO"))
+                {
+                    mensaje = "Error >> La cantidad no puede ser menor o igual a 0";
+                }
+            }
+            finally
+            {
+                cnx.Close(); 
+            }
+            return mensaje;
+        }
+
+        private string eliminarDetalle(int id)
+        {
+            string mensaje = string.Empty;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_EliminarDetalle", cnx);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", id);
+                cnx.Open();
+                int value = cmd.ExecuteNonQuery();
+                mensaje = $"Se Eliminaron {value} detalle/s";
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cnx.Close();
+            }
+            return mensaje;
+        }
+
         private Detalle obtenerDetalle(int codigo)
         {
-            Detalle detalle = new Detalle();
+            Detalle detalle = null;
             SqlCommand cmd = new SqlCommand("SP_BuscarDetalle", cnx);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@codigo", codigo);
@@ -135,20 +190,45 @@ namespace WebApplication1.Controllers
             SqlDataReader dr = cmd.ExecuteReader();
             if (dr.Read())
             {
+                detalle = new Detalle();
                 detalle.IDE_DET = dr.GetInt32(0);
-                detalle.NOM_PRO = dr.GetString(1);
-                detalle.UME_PRO = dr.GetString(2);
+                detalle.COD_ALM = dr.GetInt32(1);
+                detalle.COD_PRO = dr.GetInt32(2);
                 detalle.CAN_PRO = dr.GetInt32(3);
-                detalle.NOM_ALM = dr.GetString(4);
-                detalle.UBI_ALM = dr.GetString(5);
-                detalle.TIP_DET = dr.GetString(6);
+                detalle.TIP_DET = dr.GetString(4);
             };
             cnx.Close();
             dr.Close();
             return detalle;
         }
 
-        int GenerarCodigo()
+        private Detalle obtenerDetalleCompleto(int codigo)
+        {
+            Detalle detalle = null;
+            SqlCommand cmd = new SqlCommand("SP_ListadoGeneralxCodigo", cnx);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@codigo", codigo);
+            cnx.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                detalle = new Detalle();
+                detalle.IDE_DET = dr.GetInt32(0);
+                detalle.COD_ALM = dr.GetInt32(1);
+                detalle.COD_PRO = dr.GetInt32(2);
+                detalle.NOM_PRO = dr.GetString(3);
+                detalle.UME_PRO = dr.GetString(4);
+                detalle.CAN_PRO = dr.GetInt32(5);
+                detalle.NOM_ALM = dr.GetString(6);
+                detalle.UBI_ALM = dr.GetString(7);
+                detalle.TIP_DET = dr.GetString(8);
+            };
+            cnx.Close();
+            dr.Close();
+            return detalle;
+        }
+
+        private int GenerarCodigo()
         {
             SqlCommand cmd = new SqlCommand("SP_GenerarCodigoDetalle", cnx);
             cmd.CommandType = CommandType.StoredProcedure;
@@ -208,6 +288,55 @@ namespace WebApplication1.Controllers
                 mensaje = "Error";
                 return RedirectToAction("Create", new { error = mensaje });
             }
+        }
+
+        public ActionResult Edit(int id)
+        {
+            ViewBag.Productos = new SelectList(listarProductos(), "COD_PRO", "NOM_PRO");
+            ViewBag.Almacenes = new SelectList(listarAlmacenes(), "COD_ALM", "NOM_ALM");
+            ViewBag.Tipos = new SelectList(listarTipos());
+            Detalle detalle = Buscar(id);
+            return View(detalle);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Detalle detalle)
+        {
+            string mensaje = string.Empty;
+            if (ModelState.IsValid)
+            {
+                mensaje = editarDetalle(detalle);
+                return RedirectToAction("Index", new { mensaje = mensaje });
+            }
+            else
+            {
+                mensaje = "Error";
+                return RedirectToAction("Edit", new { error = mensaje });
+            }
+        }
+
+        public ActionResult Delete(int id)
+        {
+            string mensaje = eliminarDetalle(id);
+            return RedirectToAction("Index", new { mensaje = mensaje });
+        }
+
+        public ActionResult Details(Detalle detalle)
+        {
+            return View(detalle);
+        }
+
+        [HttpPost]
+        public ActionResult BuscarXCodigo(string ID)
+        {
+            int codigo = Convert.ToInt32(ID);
+            Detalle detalle = obtenerDetalleCompleto(codigo);
+            if (detalle == null)
+            {
+                string mensaje = "Error >> Detalle no encontrado";
+                return RedirectToAction("Index", new { mensaje = mensaje });
+            }
+            return View("Details", detalle);
         }
     }
 }

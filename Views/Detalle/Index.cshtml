@@ -4,11 +4,11 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Listado de Detalles</h2>
+<h2>Actividad Reciente</h2>
 
 <div class="container" style="display: flex; justify-content: space-between">
     <p>
-        @Html.ActionLink("Nuevo Detalle", "Create", null, new { @class = "btn btn-secondary" })
+        @Html.ActionLink("Nueva Gestión", "Create", null, new { @class = "btn btn-secondary" })
     </p>
     <div>
         @using (Html.BeginForm("BuscarXCodigo", "Detalle", FormMethod.Post, htmlAttributes: new { @class = "row g-3" }))

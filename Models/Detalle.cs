@@ -9,7 +9,7 @@ namespace WebApplication1.Models
     public class Detalle
     {
         [Required]
-        [Display(Name = "Codigo del Detalle", Order = 0)]
+        [Display(Name = "Codigo", Order = 0)]
         public int IDE_DET { get; set; }
 
         [Required]
@@ -25,7 +25,7 @@ namespace WebApplication1.Models
         public int CAN_PRO { get; set; }
 
         [Required]
-        [Display(Name = "Tipo de Detalle", Order = 4)]
+        [Display(Name = "Tipo de Actividad", Order = 4)]
         public string TIP_DET { get; set; }
 
         [Display(Name = "Nombre del Producto")]
